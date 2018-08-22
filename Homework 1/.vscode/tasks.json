@@ -1,0 +1,19 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build Homework1",
+            "type": "shell",
+            "command": "gcc",
+            "args": [
+                "-o", "Homework1.exe", "${workspaceFolder}/Homework1.c"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
