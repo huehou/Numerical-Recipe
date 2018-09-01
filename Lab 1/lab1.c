@@ -11,13 +11,13 @@ input: - a: Input nxn matrix
        - d: Tracks if permutation is even (+1) or odd (-1)
 output: Nothing. Results record in a, indx, and d
 */
-void ludcmp(float **a, int n, int *indx, float *d)
+void ludcmp(double **a, int n, int *indx, double *d)
 {
     int i, imax, j, k;
-    float big, dum, sum, temp;
-    float *vv;
+    double big, dum, sum, temp;
+    double *vv;
     
-    vv = malloc((n+1)*sizeof(float));
+    vv = malloc((n+1)*sizeof(double));
     *d = 1.0;
     
     // Track scaling for each row
@@ -116,10 +116,10 @@ input: - a: The input nxn matrix
        - b: The storage for solution
 output: Nothing
 */
-void lubksb(float **a, int n, int *indx, float b[])
+void lubksb(double **a, int n, int *indx, double b[])
 {
     int i, ii = 0, ip, j;
-    float sum;
+    double sum;
 
     for (i = 1; i <= n; i++)
     {
@@ -158,23 +158,24 @@ void lubksb(float **a, int n, int *indx, float b[])
 
 int main()
 {
-    float **a;
-    float mat[5][5] = {
+    double **a;
+    double mat[5][5] = {
         {0., 0., 0., 0., 0.},
         {0., 1., 3., 3., -5.},
         {0., 2., -4., 7., -1.},
         {0., 7., 1./2., 3., -6.},
         {0., 9., -2., 3., 8.}
     };
-    float b[5] = {0., 0., 2., 3., -10.};
+    double b[5] = {0., 0., 2., 3., -10.};
     int n = 4, *indx;
-    float d;
+    double d;
+    double cons[5]; // Container for consistency check
 
     // Setup matrix
-    a = (float **) malloc((n+1)*sizeof(float *));
+    a = (double **) malloc((n+1)*sizeof(double *));
     for (int i = 0; i <= n; ++i)
     {
-        a[i] = (float *) malloc((n+1)*sizeof(float));
+        a[i] = (double *) malloc((n+1)*sizeof(double));
     }
 
     for (int i = 1; i <= 4; i++)
@@ -200,6 +201,19 @@ int main()
         printf("%f\t", b[i]);
     }
     printf("\n");
+
+    // Consistency check
+    for(int i = 1; i <= 4; i++)
+    {
+        cons[i] = 0.;
+        for(int j = 1; j <= 4; j++)
+        {
+            cons[i] += mat[i][j]*b[j];
+        }
+        printf("%f\t",cons[i]);
+    }
+    printf("\n");
+
 
 
     free(a);
