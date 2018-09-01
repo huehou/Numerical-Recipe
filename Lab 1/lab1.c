@@ -106,6 +106,53 @@ void ludcmp(float **a, int n, int *indx, float *d)
     free(vv);
 }
 
+/* 
+LU back substitution routine
+input: - a: The input nxn matrix
+       - n: the size of the matrix
+       - indx: The permutation index
+       - b: The storage for solution
+output: Nothing
+*/
+void lubksb(float **a, int n, int *indx, float b[])
+{
+    int i, ii = 0, ip, j;
+    float sum;
+
+    for (i = 1; i <= n, i++)
+    {
+        // Permute b because of pivoting
+        ip = indx[i];
+        sum = b[ip];
+        b[ip] = b[i];
+        if (ii)
+        {
+            // Forward substitution
+            for (j = ii; j <= i - 1; j++)
+            {
+                sum -= a[i][j]*b[j]
+            }
+        }
+        else if (sum)
+        {
+            // Setup first non-zero index
+            ii = i;
+        }
+        b[i] = sum;
+    }
+
+    // Backward substitution
+    for (i = n; i >= 1; i--)
+    {
+        sum = b[i];
+        for (j = i+1; j <= n; j++)
+        {
+            sum -= a[i][j]*b[j];
+            b[i] = sum/a[i][i];
+        }
+    }
+}
+
 int main()
 {
     printf("Hello World!\n");
