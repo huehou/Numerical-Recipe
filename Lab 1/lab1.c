@@ -16,10 +16,10 @@ void ludcmp(float **a, int n, int *indx, float *d)
     int i, imax, j, k;
     float big, dum, sum, temp;
     float *vv;
-
+    
     vv = malloc((n+1)*sizeof(float));
     *d = 1.0;
-
+    
     // Track scaling for each row
     for (i = 1; i <= n; i++)
     {
@@ -45,7 +45,7 @@ void ludcmp(float **a, int n, int *indx, float *d)
     for (j = 1; j <= n; j++)
     {
         // Calculate beta
-        for (i = j; i < j; i++)
+        for (i = 1; i < j; i++)
         {
             sum = a[i][j];
             for (k = 1; k < i; k++)
@@ -54,7 +54,7 @@ void ludcmp(float **a, int n, int *indx, float *d)
             }
             a[i][j] = sum;
         }
-
+        
         // Setup for pivoting
         big = 0.0;
         for (i = j; i <= n; i++)
@@ -66,7 +66,7 @@ void ludcmp(float **a, int n, int *indx, float *d)
                 sum -= a[i][k] * a[k][j];
             }
             a[i][j] = sum;
-
+            
             // Find the largest alpha in the column (partial pivot)
             if ( (dum = vv[i]*fabs(sum)) >= big)
             {
@@ -89,11 +89,12 @@ void ludcmp(float **a, int n, int *indx, float *d)
         }
 
         indx[j] = imax;
+        
         if (a[j][j] == 0.0) 
         {
             a[j][j] = TINY;
         }
-
+        
         if (j != n)
         {
             dum = 1.0/(a[j][j]);
@@ -105,6 +106,7 @@ void ludcmp(float **a, int n, int *indx, float *d)
     }
     free(vv);
 }
+
 
 /* 
 LU back substitution routine
@@ -119,7 +121,7 @@ void lubksb(float **a, int n, int *indx, float b[])
     int i, ii = 0, ip, j;
     float sum;
 
-    for (i = 1; i <= n, i++)
+    for (i = 1; i <= n; i++)
     {
         // Permute b because of pivoting
         ip = indx[i];
@@ -130,7 +132,7 @@ void lubksb(float **a, int n, int *indx, float b[])
             // Forward substitution
             for (j = ii; j <= i - 1; j++)
             {
-                sum -= a[i][j]*b[j]
+                sum -= a[i][j]*b[j];
             }
         }
         else if (sum)
@@ -148,15 +150,60 @@ void lubksb(float **a, int n, int *indx, float b[])
         for (j = i+1; j <= n; j++)
         {
             sum -= a[i][j]*b[j];
-            b[i] = sum/a[i][i];
         }
+        b[i] = sum/a[i][i];
     }
 }
 
+
 int main()
 {
-    printf("Hello World!\n");
+    float **a;
+    float mat[5][5] = {
+        {0., 0., 0., 0., 0.},
+        {0., 1., 3., 3., -5.},
+        {0., 2., -4., 7., -1.},
+        {0., 7., 1./2., 3., -6.},
+        {0., 9., -2., 3., 8.}
+    };
+    float b[5] = {0., 0., 2., 3., -10.};
+    int n = 4, *indx;
+    float d;
 
+    // Setup matrix
+    a = (float **) malloc((n+1)*sizeof(float *));
+    for (int i = 0; i <= n; ++i)
+    {
+        a[i] = (float *) malloc((n+1)*sizeof(float));
+    }
+
+    for (int i = 1; i <= 4; i++)
+    {
+        for (int j = 1; j <= 4; j++)
+        {
+            a[i][j] = mat[i][j];
+        }
+    }
+
+    // Setup index array
+    indx = (int *) malloc((n+1)*sizeof(int));
+
+    // LU decomposition
+    ludcmp(a, n, indx, &d);
+
+    // Backward Forward substitution
+    lubksb(a, n, indx, b);
+
+    // Readout solution
+    for(int i = 1; i <= 4; i++)
+    {
+        printf("%f\t", b[i]);
+    }
+    printf("\n");
+
+
+    free(a);
+    free(indx);
     printf("\nPress ENTER to exit...\n");
     getchar();
     return 0;
