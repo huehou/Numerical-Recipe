@@ -23,6 +23,7 @@ int main()
     return 0;
 } */
 
+//  Question 1(b)(ii)
 void fun(char s[][5])
 {
     for(int i = 0; i < 4; i++)
