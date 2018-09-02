@@ -158,66 +158,174 @@ void lubksb(double **a, int n, int *indx, double b[])
 
 int main()
 {
-    double **a;
-    double mat[5][5] = {
-        {0., 0., 0., 0., 0.},
-        {0., 1., 3., 3., -5.},
-        {0., 2., -4., 7., -1.},
-        {0., 7., 1./2., 3., -6.},
-        {0., 9., -2., 3., 8.}
-    };
-    double b[5] = {0., 0., 2., 3., -10.};
-    int n = 4, *indx;
-    double d;
-    double cons[5]; // Container for consistency check
+    // /* Question 1 */
+    // double **a;
+    // double mat[5][5] = {
+    //     {0., 0., 0., 0., 0.},
+    //     {0., 1., 3., 3., -5.},
+    //     {0., 2., -4., 7., -1.},
+    //     {0., 7., 1./2., 3., -6.},
+    //     {0., 9., -2., 3., 8.}
+    // };
+    // double b[5] = {0., 0., 2., 3., -10.};
+    // int n = 4, *indx;
+    // double d;
+    // double cons[5]; // Container for consistency check
 
-    // Setup matrix
-    a = (double **) malloc((n+1)*sizeof(double *));
-    for (int i = 0; i <= n; ++i)
+    // // Setup matrix
+    // a = (double **) malloc((n+1)*sizeof(double *));
+    // for (int i = 0; i <= n; ++i)
+    // {
+    //     a[i] = (double *) malloc((n+1)*sizeof(double));
+    // }
+
+    // for (int i = 1; i <= 4; i++)
+    // {
+    //     for (int j = 1; j <= 4; j++)
+    //     {
+    //         a[i][j] = mat[i][j];
+    //     }
+    // }
+
+    // // Setup index array
+    // indx = (int *) malloc((n+1)*sizeof(int));
+
+    // // LU decomposition
+    // ludcmp(a, n, indx, &d);
+
+    // // Backward Forward substitution
+    // lubksb(a, n, indx, b);
+
+    // // Readout solution
+    // printf("Solution is: ");
+    // for(int i = 1; i <= 4; i++)
+    // {
+    //     printf("%f\t", b[i]);
+    // }
+    // printf("\n");
+
+    // // Consistency check
+    // printf("Consistency check: b = ");
+    // for(int i = 1; i <= 4; i++)
+    // {
+    //     cons[i] = 0.;
+    //     for(int j = 1; j <= 4; j++)
+    //     {
+    //         cons[i] += mat[i][j]*b[j];
+    //     }
+    //     printf("%f\t",cons[i]);
+    // }
+    // printf("\n");
+
+
+
+    // free(a);
+    // free(indx);
+
+    /* Question 2 
+       We setup the solution such that effectively we are solving the equation
+       M*V = b
+       The solution of V is eventually saved in b so we make no distinction in the declaration
+    */
+
+    int L=2; // Size of grid
+    int N = (L+1)*(L+1); // Size of matrix
+    double *V; //
+    V = (double *) malloc((N+1)*sizeof(double));
+
+    double **M; // Potential at each grid point
+    M = (double **) malloc((N+1)*sizeof(double *));
+    for (int i = 1; i <= N; i++)
     {
-        a[i] = (double *) malloc((n+1)*sizeof(double));
+        M[i] = (double *) malloc((N+1)*sizeof(double));
     }
+    
 
-    for (int i = 1; i <= 4; i++)
+    // Setup the values for V
+    for (int i = 1; i <= N-1; i++)
     {
-        for (int j = 1; j <= 4; j++)
+        V[i] = 0.;
+    }
+    V[N] = 1.;
+
+    // Setup the values for M
+    for(int i = 1; i <= N; i++)
+    {
+        // Initialise everything as zero and change accordingly
+        for(int j = 1; j <= N; j++)
         {
-            a[i][j] = mat[i][j];
+            M[i][j] = 0.;
+        }
+
+        if (i == 1) // VA
+        {
+            M[i][1] = 1.;
+        }
+        else if (i == N) // VB
+        {
+            M[i][N] = 1.;
+        }
+        else if (i == L+1) // Lower right corner
+        {
+            M[i][i-1] = 1.;
+            M[i][i] = -2.;
+            M[i][i+L+1] = 1.;
+        }
+        else if (i == N-L) // Upper left corner
+        {
+            M[i][i] = -2.;
+            M[i][i+1] = 1.;
+            M[i][i-L-1] = 1.;
+        }
+        else if (i < L+1) // Lower edge
+        {
+            M[i][i] = -3.;
+            M[i][i-1] = 1.;
+            M[i][i+1] = 1.;
+            M[i][i+L+1] = 1.;
+        }
+        else if (i%(L+1) == 1) // Left edge 
+        {
+            M[i][i] = -3.;
+            M[i][i+1] = 1.;
+            M[i][i+L+1] = 1.;
+            M[i][i-L-1] = 1.;
+        }
+        else if (i%(L+1) == 0) // Right edge
+        {
+            M[i][i] = -3.;
+            M[i][i-1] = 1.;
+            M[i][i+L+1] = 1.;
+            M[i][i-L-1] = 1.;
+        }
+        else if (i > N-L) // Upper edge
+        {
+            M[i][i] = -3.;
+            M[i][i-1] = 1.;
+            M[i][i+1] = 1.;
+            M[i][i-L-1] = 1.;
+        }
+        else // Rest of the middle grid points
+        {
+            M[i][i] = -4.;
+            M[i][i-1] = 1.;
+            M[i][i+1] = 1.;
+            M[i][i-L-1] = 1.;
+            M[i][i+L+1] = 1.;
         }
     }
 
-    // Setup index array
-    indx = (int *) malloc((n+1)*sizeof(int));
-
-    // LU decomposition
-    ludcmp(a, n, indx, &d);
-
-    // Backward Forward substitution
-    lubksb(a, n, indx, b);
-
-    // Readout solution
-    for(int i = 1; i <= 4; i++)
+    for (int i = 1; i <= N; i++)
     {
-        printf("%f\t", b[i]);
-    }
-    printf("\n");
-
-    // Consistency check
-    for(int i = 1; i <= 4; i++)
-    {
-        cons[i] = 0.;
-        for(int j = 1; j <= 4; j++)
+        for (int j = 1; j <= N; j++)
         {
-            cons[i] += mat[i][j]*b[j];
+            printf("%.4f\t",M[i][j]);
         }
-        printf("%f\t",cons[i]);
+        printf("\n");
     }
-    printf("\n");
 
-
-
-    free(a);
-    free(indx);
+    free(V);
+    free(M);
     printf("\nPress ENTER to exit...\n");
     getchar();
     return 0;
