@@ -227,9 +227,13 @@ int main()
        M*V = b
        The solution of V is eventually saved in b so we make no distinction in the declaration
     */
-
-    int L=2; // Size of grid
+    
+    int L=1; // Size of grid
     int N = (L+1)*(L+1); // Size of matrix
+    int *indx; // Track permutation order
+    indx = (int *) malloc((N+1)*sizeof(int));
+    double d; // Track permutation is odd or even
+    double r = 1/sqrt(L); // resistance
     double *V; //
     V = (double *) malloc((N+1)*sizeof(double));
 
@@ -315,14 +319,31 @@ int main()
         }
     }
 
-    for (int i = 1; i <= N; i++)
-    {
-        for (int j = 1; j <= N; j++)
-        {
-            printf("%.4f\t",M[i][j]);
-        }
-        printf("\n");
-    }
+    // LU decomposition
+    ludcmp(M, N, indx, &d);
+
+    // LU back substitution
+    lubksb(M, N, indx, V);
+
+    // To calculate total current
+    printf("Total current is: %f\n", (V[2]+V[L+2])/r);
+    printf("Effective resistance is: %f\n", r/(V[2]+V[L+2]));
+
+    
+
+    // for (int i = 1; i <= N;  i++)
+    // {
+    //     printf("%.4f\n",V[i]);
+    // }
+
+    // for (int i = 1; i <= N; i++)
+    // {
+    //     for (int j = 1; j <= N; j++)
+    //     {
+    //         printf("%.4f\t",M[i][j]);
+    //     }
+    //     printf("\n");
+    // }
 
     free(V);
     free(M);
