@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <time.h>
 #define TINY 1.0e-20
 
 /*
@@ -228,7 +229,8 @@ int main()
        The solution of V is eventually saved in b so we make no distinction in the declaration
     */
     
-    int L=1; // Size of grid
+    clock_t begin = clock(); // Start of clock
+    int L=32; // Size of grid
     int N = (L+1)*(L+1); // Size of matrix
     int *indx; // Track permutation order
     indx = (int *) malloc((N+1)*sizeof(int));
@@ -325,9 +327,12 @@ int main()
     // LU back substitution
     lubksb(M, N, indx, V);
 
+    clock_t end = clock();
+    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
     // To calculate total current
     printf("Total current is: %f\n", (V[2]+V[L+2])/r);
     printf("Effective resistance is: %f\n", r/(V[2]+V[L+2]));
+    printf("This take time %f seconds", time_spent);
 
     
 
@@ -347,6 +352,7 @@ int main()
 
     free(V);
     free(M);
+    free(indx);
     printf("\nPress ENTER to exit...\n");
     getchar();
     return 0;
