@@ -230,7 +230,7 @@ int main()
     */
     
     clock_t begin = clock(); // Start of clock
-    int L=32; // Size of grid
+    int L=2; // Size of grid
     int N = (L+1)*(L+1); // Size of matrix
     int *indx; // Track permutation order
     indx = (int *) malloc((N+1)*sizeof(int));
