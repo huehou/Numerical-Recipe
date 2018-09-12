@@ -159,7 +159,7 @@ void lubksb(double **a, int n, int *indx, double b[])
 
 int main()
 {
-    // /* Question 1 */
+    /* Question 1 */
     // double **a;
     // double mat[5][5] = {
     //     {0., 0., 0., 0., 0.},
@@ -334,21 +334,7 @@ int main()
     printf("Effective resistance is: %f\n", r/(V[2]+V[L+2]));
     printf("This take time %f seconds", time_spent);
 
-    
 
-    // for (int i = 1; i <= N;  i++)
-    // {
-    //     printf("%.4f\n",V[i]);
-    // }
-
-    // for (int i = 1; i <= N; i++)
-    // {
-    //     for (int j = 1; j <= N; j++)
-    //     {
-    //         printf("%.4f\t",M[i][j]);
-    //     }
-    //     printf("\n");
-    // }
 
     free(V);
     free(M);
