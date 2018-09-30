@@ -36,11 +36,11 @@ void polint(TYPE xa[], TYPE ya[], int n, TYPE x, TYPE *y, TYPE *dy)
         }
         // Initialise c and d
         c[i] = ya[i];
-        d[i] = ya[i]
+        d[i] = ya[i];
     }
 
     // Initialise y to value closest to x
-    *y = ya[ns--]
+    *y = ya[ns--];
 
     for (m = 1; m < n; m++)
     {
@@ -67,7 +67,29 @@ void polint(TYPE xa[], TYPE ya[], int n, TYPE x, TYPE *y, TYPE *dy)
 
 int main()
 {
-    printf("Hello World \n");
+    // Question 1
+
+    // Define the array
+    TYPE xa[5] = {0., -1., 1., 2., 4.};
+    TYPE ya[5] = {0., 1.25, 2., 3., 0.};
+
+    // Build the x-axis and y-axis for interpolation
+    int pointsNum = 100;
+    TYPE x[pointsNum + 1];
+    TYPE y[pointsNum + 1];
+    TYPE dx = 5./(pointsNum-1);
+
+    for(int i = 1; i <= pointsNum; i++)
+    {
+        x[i] = -1 + (i-1)*dx;
+    }
+
+
+    for(int i = 1; i <= pointsNum; i++)
+    {
+        printf("%f\n", x[i]);
+    }
+    printf("\n");
 
     printf("\nPress Enter to exit...");
     getchar();
