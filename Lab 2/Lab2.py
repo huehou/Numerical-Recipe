@@ -10,7 +10,7 @@ xa = np.array([-1, 1, 2, 4])
 ya = np.array([1.25, 2, 3, 0])
 
 plt.plot(x,y, label = "Interpolation")
-plt.plot(xa, ya, 'kx', label = "Data")
+plt.plot(xa, ya, 'ko', label = "Data")
 plt.tick_params(direction = 'in', top = True, right = True)
 plt.xlabel("$x$")
 plt.ylabel("$y$")

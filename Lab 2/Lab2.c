@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdlib.h>
 #define TYPE float // TYPE is defined for easy switching (between float and double)
+#define FUNC(x) ((*func)(x))
 
 /* 
 Polynomial interpolation routine
@@ -65,6 +66,34 @@ void polint(TYPE xa[], TYPE ya[], int n, TYPE x, TYPE *y, TYPE *dy)
     free(d);
 }
 
+TYPE trapzd(TYPE (*func)(TYPE), TYPE a, TYPE b, int n)
+{
+    TYPE x, tnm, sum, del;
+    static TYPE s;
+    int it, j;
+
+    if (n == 1)
+    {
+        return (s = 0.5*(b-a)*(FUNC(a)+FUNC(b)));
+    }
+    else
+    {
+        for (it = 1, j = 1; j <= it; j++, x += del) 
+        {
+            it <<= 1;
+        }
+        tnm = it; 
+        del = (b-a)/tnm;
+        x = a + 0.5*del;
+        for (sum = 0.0, j = 1; j <= it; j++, x += del)
+        {
+            sum += FUNC(x);
+        }
+        s = 0.5*(s+(b-a)*sum/tnm);
+        return s;
+    }
+}
+
 int main()
 {
     // Question 1
@@ -94,13 +123,6 @@ int main()
         polint(xa, ya, 4, x[i], &y[i], &dy[i]);
         fprintf(ofp, "%f\t%f\n", x[i], y[i]);
     }
-
-
-    // for(int i = 1; i <= pointsNum; i++)
-    // {
-    //     printf("%f\n", x[i]);
-    // }
-    // printf("\n");
 
     printf("\nPress Enter to exit...");
     getchar();
