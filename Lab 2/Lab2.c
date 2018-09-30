@@ -77,6 +77,7 @@ int main()
     int pointsNum = 100;
     TYPE x[pointsNum + 1];
     TYPE y[pointsNum + 1];
+    TYPE dy[pointsNum + 1];
     TYPE dx = 5./(pointsNum-1);
 
     for(int i = 1; i <= pointsNum; i++)
@@ -84,12 +85,22 @@ int main()
         x[i] = -1 + (i-1)*dx;
     }
 
+    // Save data to file
+    FILE *ofp;
+    ofp = fopen("Lab2Q1.dat", "w");
 
     for(int i = 1; i <= pointsNum; i++)
     {
-        printf("%f\n", x[i]);
+        polint(xa, ya, 4, x[i], &y[i], &dy[i]);
+        fprintf(ofp, "%f\t%f\n", x[i], y[i]);
     }
-    printf("\n");
+
+
+    // for(int i = 1; i <= pointsNum; i++)
+    // {
+    //     printf("%f\n", x[i]);
+    // }
+    // printf("\n");
 
     printf("\nPress Enter to exit...");
     getchar();
