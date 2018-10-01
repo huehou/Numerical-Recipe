@@ -3,6 +3,10 @@
 #include <stdlib.h>
 #define TYPE float // TYPE is defined for easy switching (between float and double)
 #define FUNC(x) ((*func)(x))
+#define EPS 1.0e-6
+#define JMAX 20
+#define JMAXP (JMAX+1)
+#define K 5
 
 /* 
 Polynomial interpolation routine
@@ -102,9 +106,38 @@ TYPE trapzd(TYPE (*func)(TYPE), TYPE a, TYPE b, int n)
     }
 }
 
+/* 
+Romberg integration routine
+input: - func: Integrand as a function
+       - a: Lower integration limit
+       - b: Upper integration limit
+output: Result of integration
+*/
+TYPE qromb(TYPE (*func)(TYPE), TYPE a, TYPE b)
+{
+    TYPE ss, dss;
+    TYPE s[JMAXP], h[JMAXP+1];
+    int j;
+
+    h[1] = 1.0;
+    for (j = 1; j <= JMAX; j++)
+    {
+        s[j] = trapzd(func, a, b, j);
+        if (j >= K)
+        {
+            polint(&h[j-K], &s[j-K], K, 0.0, &ss, &dss);
+            if (fabs(dss) <= EPS*fabs(ss)) return ss;
+        }
+        h[j+1] = 0.25*h[j];
+    }
+    printf("Too many steps in routine qromb");
+    return 0.0;
+}
+
+// Integrand of question 2
 TYPE integrand(TYPE x)
 {
-    return x*x;
+    return x*x*x*x * log(x + sqrt(x*x + 1));
 }
 
 int Question1()
@@ -143,11 +176,14 @@ int Question1()
 int Question2()
 {
     TYPE s;
-    for(int i = 1; i <= 10; i++)
+    for(int i = 1; i <= 20; i++)
     {
-        s = trapzd(integrand, 1, 2, i);
-        printf("%f\n", s);   
+        s = trapzd(integrand, 0, 2, i);
+        printf("%.16f\n", s);   
     }
+
+    s = qromb(integrand, 0, 2);
+    printf("%.16f\n",s);
     
     return 0;
 }

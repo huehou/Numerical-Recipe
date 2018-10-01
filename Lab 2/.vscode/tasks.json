@@ -8,7 +8,7 @@
             "type": "shell",
             "command": "gcc",
             "args": [
-                "-o", "Lab2.exe", "${workspaceFolder}/Lab2.c"
+                "-o", "Lab2.exe", "${workspaceFolder}/Lab2.c", "-lm"
             ],
             "group": {
                 "kind": "build",
