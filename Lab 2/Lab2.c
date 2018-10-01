@@ -6,7 +6,7 @@
 #define EPS 1.0e-6
 #define JMAX 20
 #define JMAXP (JMAX+1)
-#define K 5
+#define K 9
 
 /* 
 Polynomial interpolation routine
@@ -126,6 +126,7 @@ TYPE qromb(TYPE (*func)(TYPE), TYPE a, TYPE b)
         if (j >= K)
         {
             polint(&h[j-K], &s[j-K], K, 0.0, &ss, &dss);
+            printf("%.24f\t%.24f\n", ss, dss);
             if (fabs(dss) <= EPS*fabs(ss)) return ss;
         }
         h[j+1] = 0.25*h[j];
@@ -176,14 +177,8 @@ int Question1()
 int Question2()
 {
     TYPE s;
-    for(int i = 1; i <= 20; i++)
-    {
-        s = trapzd(integrand, 0, 2, i);
-        printf("%.16f\n", s);   
-    }
-
     s = qromb(integrand, 0, 2);
-    printf("%.16f\n",s);
+    printf("%.24f\n",s);
     
     return 0;
 }
