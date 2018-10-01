@@ -66,6 +66,14 @@ void polint(TYPE xa[], TYPE ya[], int n, TYPE x, TYPE *y, TYPE *dy)
     free(d);
 }
 
+/*
+Trapezoidal Rule Integration
+input: - func: Integrand as a function
+       - a: Lower limit of integration
+       - b: Upper limit of integration
+       - n: Number of calls
+output: Result of integration
+*/
 TYPE trapzd(TYPE (*func)(TYPE), TYPE a, TYPE b, int n)
 {
     TYPE x, tnm, sum, del;
@@ -78,7 +86,7 @@ TYPE trapzd(TYPE (*func)(TYPE), TYPE a, TYPE b, int n)
     }
     else
     {
-        for (it = 1, j = 1; j <= it; j++, x += del) 
+        for (it = 1, j = 1; j < n-1; j++) 
         {
             it <<= 1;
         }
@@ -94,7 +102,12 @@ TYPE trapzd(TYPE (*func)(TYPE), TYPE a, TYPE b, int n)
     }
 }
 
-int main()
+TYPE integrand(TYPE x)
+{
+    return x*x;
+}
+
+int Question1()
 {
     // Question 1
 
@@ -123,6 +136,25 @@ int main()
         polint(xa, ya, 4, x[i], &y[i], &dy[i]);
         fprintf(ofp, "%f\t%f\n", x[i], y[i]);
     }
+
+    return 0;
+}
+
+int Question2()
+{
+    TYPE s;
+    for(int i = 1; i <= 10; i++)
+    {
+        s = trapzd(integrand, 1, 2, i);
+        printf("%f\n", s);   
+    }
+    
+    return 0;
+}
+
+int main()
+{
+    Question2();
 
     printf("\nPress Enter to exit...");
     getchar();
