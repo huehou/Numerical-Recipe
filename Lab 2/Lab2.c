@@ -193,7 +193,7 @@ double drand64(void)
    return (double) x * 5.4210108624275218e-20; 
 }
 
-double MonteCarlo(double d)
+void MonteCarlo(double d, double steps, double *mean, double *error)
 {
     double r1, r2, theta1, theta2, phi1, phi2;
     double x1, x2, y1, y2, z1, z2;
@@ -202,6 +202,9 @@ double MonteCarlo(double d)
     double x1new, x2new, y1new, y2new, z1new, z2new;
     double rA1, rA2, rB1, rB2, r12, psi, E;
     double rA1new, rA2new, rB1new, rB2new, r12new, psinew, Enew;
+    *mean = 0;
+    *error = 0;
+    int counter=0;
 
     // Starting point of r1 and r2
     r1 = 2.*drand64() - 1.;
@@ -226,42 +229,74 @@ double MonteCarlo(double d)
     psi = exp(-rA1)*exp(-rB2) + exp(-rA2)*exp(-rB1);
     E = -((1.-1./rA1-1./rB2)*exp(-rA1-rB2) + (1. - 1./rA2 - 1./rB1)*exp(-rA2-rB1))/psi;
     E = E - (1./rA1 + 1./rB1 + 1./rA2 + 1./rB2) + (1./d + 1./r12);
+
+    for (int i = 0; i < steps; i++)
+    {
+        // Generate step
+        dr1 = (2.*drand64() - 1.)*3;
+        dtheta1 = drand64()*PI;
+        dphi1 = drand64()*2*PI;
+        dr2 = (2.*drand64() - 1.)*3;
+        dtheta2 = drand64()*PI;
+        dphi2 = drand64()*2*PI;
+        dx1 = dr1*sin(dtheta1)*cos(dphi1);
+        dy1 = dr1*sin(dtheta1)*sin(dphi1);
+        dz1 = dr1*cos(dtheta1);
+        dx2 = dr2*sin(dtheta2)*cos(dphi2);
+        dy2 = dr2*sin(dtheta2)*sin(dphi2);
+        dz2 = dr2*cos(dtheta2);
+
+        // New place
+        x1new = x1 + dx1;
+        x2new = x2 + dx2;
+        y1new = y1 + dy1;
+        y2new = y2 + dy2;
+        z1new = z1 + dz1;
+        z2new = z2 + dz2;
+
+        // Other quantities with rA = (0,0,0) and rB = (0,0,d)
+        rA1new = sqrt(x1new*x1new+y1new*y1new+z1new*z1new);
+        rA2new = sqrt(x2new*x2new+y2new*y2new+z2new*z2new);
+        rB1new = sqrt(x1new*x1new+y1new*y1new+(z1new-d)*(z1new-d));
+        rB2new = sqrt(x2new*x2new+y2new*y2new+(z2new-d)*(z2new-d));
+        psinew = exp(-rA1new)*exp(-rB2new) + exp(-rA2new)*exp(-rB1new);
+        
+        double rate = fmin(1, (psinew*psinew)/(psi*psi));
+        if (drand64() <= rate)
+        {
+            counter += 1;
+            printf("%d\n",counter);
+            x1 = x1new;
+            y1 = y1new;
+            z1 = z1new;
+            x2 = x2new;
+            y2 = y2new;
+            z2 = z2new;
+            rA1 = rA1new;
+            rA2 = rA2new;
+            rB1 = rB1new;
+            rB2 = rB2new;
+            psi = psinew;
+            r12 = sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) + (z1-z2)*(z1-z2));
+            E = -((1.-1./rA1-1./rB2)*exp(-rA1-rB2) + (1. - 1./rA2 - 1./rB1)*exp(-rA2-rB1))/psi;
+            E = E - (1./rA1 + 1./rB1 + 1./rA2 + 1./rB2) + (1./d + 1./r12);
+        }
+        *mean += E;
+        *error += E*E;
+    }
     
-    // Generate step
-    dr1 = 2.*drand64() - 1.;
-    dtheta1 = drand64()*PI;
-    dphi1 = drand64()*2*PI;
-    dr2 = 2.*drand64() - 1.;
-    dtheta2 = drand64()*PI;
-    dphi2 = drand64()*2*PI;
-    dx1 = dr1*sin(theta1)*cos(phi1);
-    dy1 = dr1*sin(theta1)*sin(phi1);
-    dz1 = dr1*cos(theta1);
-    dx2 = dr2*sin(theta2)*cos(phi2);
-    dy2 = dr2*sin(theta2)*sin(phi2);
-    dz2 = dr2*cos(theta2);
-
-    // New place
-    x1new = x1 + dx1;
-    x2new = x2 + dx2;
-    y1new = y1 + dy1;
-    y2new = y2 + dy2;
-    z1new = z1 + dz1;
-    z2new = z2 + dz2;
-
-    // Other quantities with rA = (0,0,0) and rB = (0,0,d)
-    rA1new = sqrt(x1new*x1new+y1new*y1new+z1new*z1new);
-    rA2new = sqrt(x2new*x2new+y2new*y2new+z2new*z2new);
-    rB1new = sqrt(x1new*x1new+y1new*y1new+(z1new-d)*(z1new-d));
-    rB2new = sqrt(x2new*x2new+y2new*y2new+(z2new-d)*(z2new-d));
-    psinew = exp(-rA1new)*exp(-rB2new) + exp(-rA2new)*exp(-rB1new);
-
-    printf("%f\n",rate);
+    *mean /= steps;
+    *error /= steps;
+    *error = *error - (*mean)*(*mean);
+    *error = sqrt(*error);
 }
 
 int Question3()
 {
-    MonteCarlo(1);
+    double mean, error;
+    MonteCarlo(1, 100000, &mean, &error);
+    printf("rAB=%f\n", 1*0.52917721092);
+    printf("%f\t%f\n", mean*27.211385, error*27.211385);
 }
 
 int main()
