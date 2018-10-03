@@ -140,6 +140,14 @@ TYPE integrand(TYPE x)
 {
     return x*x*x*x * log(x + sqrt(x*x + 1));
 }
+static unsigned long long int x = 1;
+
+// Random number generator
+double drand64(void) 
+{
+   x = 6364136223846793005ll * x + (long long int) 1;
+   return (double) x * 5.4210108624275218e-20; 
+}
 
 int Question1()
 {
@@ -183,9 +191,17 @@ int Question2()
     return 0;
 }
 
+int Question3()
+{
+    for(int i = 0; i < 1000; i++)
+    {  
+        printf("%f\n", drand64());
+    }
+}
+
 int main()
 {
-    Question2();
+    Question3();
 
     printf("\nPress Enter to exit...");
     getchar();
