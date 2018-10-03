@@ -193,7 +193,7 @@ double drand64(void)
    return (double) x * 5.4210108624275218e-20; 
 }
 
-void MonteCarlo(double d, double steps, double *mean, double *error)
+void MonteCarlo(double d, double steps, double *mean)
 {
     double r1, r2, theta1, theta2, phi1, phi2;
     double x1, x2, y1, y2, z1, z2;
@@ -203,7 +203,6 @@ void MonteCarlo(double d, double steps, double *mean, double *error)
     double rA1, rA2, rB1, rB2, r12, psi, E;
     double rA1new, rA2new, rB1new, rB2new, r12new, psinew, Enew;
     *mean = 0;
-    *error = 0;
     int counter=0;
 
     // Starting point of r1 and r2
@@ -265,7 +264,6 @@ void MonteCarlo(double d, double steps, double *mean, double *error)
         if (drand64() <= rate)
         {
             counter += 1;
-            printf("%d\n",counter);
             x1 = x1new;
             y1 = y1new;
             z1 = z1new;
@@ -282,21 +280,50 @@ void MonteCarlo(double d, double steps, double *mean, double *error)
             E = E - (1./rA1 + 1./rB1 + 1./rA2 + 1./rB2) + (1./d + 1./r12);
         }
         *mean += E;
-        *error += E*E;
     }
     
     *mean /= steps;
-    *error /= steps;
-    *error = *error - (*mean)*(*mean);
-    *error = sqrt(*error);
+    // printf("Acceptance rate: %f\n", counter/steps);
 }
 
 int Question3()
 {
-    double mean, error;
-    MonteCarlo(1, 100000, &mean, &error);
-    printf("rAB=%f\n", 1*0.52917721092);
-    printf("%f\t%f\n", mean*27.211385, error*27.211385);
+    // Unit conversion:
+    double hartree = 27.211385;
+    double bohr = 0.52917721092;
+    double mean;
+    double res, error;
+    double times = 100.;
+    double d;
+
+    // Save data to file
+    FILE *ofp;
+    ofp = fopen("Lab2Q3.dat", "w");
+
+    for (int j = 0; j < 27; j++)
+    {
+        d = 0.8 + j*0.2;
+        res = 0;
+        error = 0;
+
+        for(int i = 0; i < times; i++)
+        {
+            MonteCarlo(d, 100000, &mean);
+            // printf("%f\n", mean);
+            res += mean;
+            error += mean*mean;
+        }
+
+        res /= times;
+        error /= times;
+        error -= res*res;
+        error = sqrt(error/(times-1));
+        printf("rAB = %f A\n", d*bohr);
+        printf("Result is %f with error %f \n", res*hartree, error*hartree);
+
+        fprintf(ofp, "%f\t%f\t%f\n", d*bohr, res*hartree, error*hartree);
+    }
+    
 }
 
 int main()
