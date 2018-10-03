@@ -300,9 +300,9 @@ int Question3()
     FILE *ofp;
     ofp = fopen("Lab2Q3.dat", "w");
 
-    for (int j = 0; j < 27; j++)
+    for (int j = 0; j < 108; j++)
     {
-        d = 0.8 + j*0.2;
+        d = 0.8 + j*0.05;
         res = 0;
         error = 0;
 
