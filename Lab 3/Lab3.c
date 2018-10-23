@@ -20,6 +20,8 @@ void MonteCarlo(int size)
     double J = 1., sign;
     double energy = 0., Ediff;
     int index, flag;
+    double T = 1;
+    double rate;
 
     // Setup the initial grid
     for(int i = 1; i <= size*size; i++)
@@ -59,11 +61,14 @@ void MonteCarlo(int size)
             energy += -J*A[i-size+1]*B[i];
         }
     }
+    printf("Energy: %f\n",energy);
 
-    // Pick a random site to flip
-    for(int i = 0; i < 10; i++)
+    for(int i = 0; i < 1000; i++)
     {
+        // Pick a random site to flip
         index = (int) (drand64()*size*size + 1);
+
+        // Then find out energy difference
         if(drand64() > 0.5)
         {
             // For B
@@ -97,7 +102,7 @@ void MonteCarlo(int size)
                 Ediff += 2*J*A[index+1]*sign;
                 Ediff += 2*J*A[index-size+1]*sign;
             }
-            printf("B: %f\t%d\n",Ediff, index);
+            // printf("B: %f\t%d\n",Ediff, index);
         }
         else
         {
@@ -132,8 +137,27 @@ void MonteCarlo(int size)
                 Ediff += 2*J*sign*B[index-1];
                 Ediff += 2*J*sign*B[index-1+size];
             }
-            printf("A: %f\n",Ediff);
+            // printf("A: %f\n",Ediff);
         }
+
+        // Calculate acceptance rate
+        rate = fmin(1, exp(-Ediff/T));
+        if(drand64()<rate)
+        {
+            
+            if(flag == 0)
+            {
+                printf("%d\t%f\t%f\n",index, A[index], sign);
+                A[index] = sign;
+            }
+            else
+            {
+                printf("%d\t%f\t%f\n",index, B[index], sign);
+                B[index] = sign;
+            }
+            energy += Ediff;
+        }
+        printf("Energy: %f\t Ediff: %f\n",energy, Ediff);
     }
 
     for(int i = 1; i <= size*size; i++)
