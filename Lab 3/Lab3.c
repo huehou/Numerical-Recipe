@@ -17,8 +17,9 @@ input: - size: the number of rows and columns of A and B parallelogram, which we
 void MonteCarlo(int size)
 {
     double A[size*size + 1], B[size*size + 1];
-    double J = 1.;
-    double energy = 0.;
+    double J = 1., sign;
+    double energy = 0., Ediff;
+    int index, flag;
 
     // Setup the initial grid
     for(int i = 1; i <= size*size; i++)
@@ -32,24 +33,21 @@ void MonteCarlo(int size)
     {
         if(i == size)
         {
+            // Lower right corner for B
             energy += -J*A[i]*B[i];
             energy += -J*A[1]*B[i];
             energy += -J*A[size*size - size + 1]*B[i];
         }
         else if(i < size)
         {
+            // Lower edge for B
             energy += -J*A[i]*B[i];
             energy += -J*A[i+1]*B[i];
             energy += -J*A[size*size-size+1+i]*B[i];
         }
-        else if(i == size*size)
-        {
-            energy += -J*A[i]*B[i];
-            energy += -J*A[size*size-size+1]*B[i];
-            energy += -J*A[size*size-2*size+1]*B[i];
-        }
         else if (i%size == 0)
         {
+            // Right edge for B
             energy += -J*A[i]*B[i];
             energy += -J*A[i-size+1];
             energy += -J*A[i-2*size+1];
@@ -59,6 +57,82 @@ void MonteCarlo(int size)
             energy += -J*A[i]*B[i];
             energy += -J*A[i+1]*B[i];
             energy += -J*A[i-size+1]*B[i];
+        }
+    }
+
+    // Pick a random site to flip
+    for(int i = 0; i < 10; i++)
+    {
+        index = (int) (drand64()*size*size + 1);
+        if(drand64() > 0.5)
+        {
+            // For B
+            flag = 1;
+            sign = -B[index];
+            Ediff = 0.;
+            if(index == size)
+            {
+                // Lower right corner for B
+                Ediff += 2*J*A[index]*sign;
+                Ediff += 2*J*A[1]*sign;
+                Ediff += 2*J*A[size*size - size + 1]*sign;
+            }
+            else if(index < size)
+            {
+                // Lower edge for B
+                Ediff += 2*J*A[index]*sign;
+                Ediff += 2*J*A[index+1]*sign;
+                Ediff += 2*J*A[size*size-size+1+index]*sign;
+            }
+            else if (index%size == 0)
+            {
+                // Right edge for B
+                Ediff += 2*J*A[index]*sign;
+                Ediff += 2*J*A[index-size+1];
+                Ediff += 2*J*A[index-2*size+1];
+            }
+            else
+            {
+                Ediff += 2*J*A[index]*sign;
+                Ediff += 2*J*A[index+1]*sign;
+                Ediff += 2*J*A[index-size+1]*sign;
+            }
+            printf("B: %f\t%d\n",Ediff, index);
+        }
+        else
+        {
+            // For A
+            flag = 0;
+            sign = -A[index];
+            Ediff = 0.;
+            if(index == size*size - size + 1)
+            {
+                // Upper left corner for A
+                Ediff += 2*J*sign*B[index];
+                Ediff += 2*J*sign*B[size*size];
+                Ediff += 2*J*sign*B[size];
+            }
+            else if(index%size == 1)
+            {
+                // Right edge for A
+                Ediff += 2*J*sign*B[index];
+                Ediff += 2*J*sign*B[index + size - 1];
+                Ediff += 2*J*sign*B[index + 2*size - 1];
+            }
+            else if(index > size*size-size+1)
+            {
+                // Upper edge for A
+                Ediff += 2*J*sign*B[index];
+                Ediff += 2*J*sign*B[index-1];
+                Ediff += 2*J*sign*B[index%size - 1];
+            }
+            else
+            {
+                Ediff += 2*J*sign*B[index];
+                Ediff += 2*J*sign*B[index-1];
+                Ediff += 2*J*sign*B[index-1+size];
+            }
+            printf("A: %f\n",Ediff);
         }
     }
 
