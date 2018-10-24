@@ -17,16 +17,19 @@ input: - size: the number of rows and columns of A and B parallelogram, which we
 void MonteCarlo(int size, int steps, double T, double* mean, double* var)
 {
     double A[size*size + 1], B[size*size + 1];
-    double J = 1., sign;
-    double energy = 0., Ediff;
+    double J = 1.;
+    double energy = 0., Ediff = 0.;
     int index, flag;
     double rate;
+
+    *mean = 0.;
+    *var = 0.;
 
     // Setup the initial grid
     for(int i = 1; i <= size*size; i++)
     {
-        A[i] = drand64() > 0.5 ? 1. : -1;
-        B[i] = drand64() > 0.5 ? 1. : -1;
+        A[i] = drand64() > 0.5 ? 1. : -1.;
+        B[i] = drand64() > 0.5 ? 1. : -1.;
     }
 
     // Calculate initial energy
@@ -60,7 +63,7 @@ void MonteCarlo(int size, int steps, double T, double* mean, double* var)
             energy += -J*A[i-size+1]*B[i];
         }
     }
-    printf("Energy: %f\n",energy);
+    
 
     for(int i = 0; i < steps; i++)
     {
@@ -116,7 +119,7 @@ void MonteCarlo(int size, int steps, double T, double* mean, double* var)
             }
             else if(index%size == 1)
             {
-                // Right edge for A
+                // Left edge for A
                 Ediff += 2*J*A[index]*B[index];
                 Ediff += 2*J*A[index]*B[index + size - 1];
                 Ediff += 2*J*A[index]*B[index + 2*size - 1];
@@ -126,7 +129,15 @@ void MonteCarlo(int size, int steps, double T, double* mean, double* var)
                 // Upper edge for A
                 Ediff += 2*J*A[index]*B[index];
                 Ediff += 2*J*A[index]*B[index-1];
-                Ediff += 2*J*A[index]*B[index%size - 1];
+                if (index % size == 0)
+                {
+                    Ediff += 2*J*A[index]*B[size - 1];
+                }
+                else
+                {
+                    Ediff += 2*J*A[index]*B[index % size - 1];
+                }
+                
             }
             else
             {
@@ -141,7 +152,6 @@ void MonteCarlo(int size, int steps, double T, double* mean, double* var)
         rate = fmin(1, exp(-Ediff/T));
         if(drand64()<rate)
         {
-            
             if(flag == 0)
             {
                 A[index] *= -1;
@@ -152,7 +162,6 @@ void MonteCarlo(int size, int steps, double T, double* mean, double* var)
             }
             energy += Ediff;
         }
-        
         // Calculate mean and variance
         *mean += energy;
         *var += energy*energy;
@@ -169,10 +178,15 @@ int main()
     double T = 1.; //temperature
     double C;
 
-    MonteCarlo(size, 1000, T, &mean, &var);
-    printf("%f\t%f\n", mean, var);
-    C = 1/(T*T*(double) N)*(var-mean*mean);
-    printf("Heat capacity is: %f\n", C);
+    for(double i = 1.; i <= 1.1; i = i+0.1)
+    {
+        mean = 0.; var = 0.;
+        MonteCarlo(size, 1000, i, &mean, &var);
+        printf("%f\t%f\n", mean, var);
+        C = 1/(T*T*(double) N)*(var-mean*mean);
+        printf("Heat capacity is: %f\n", C);
+    }
+    
 
     printf("\nPress ENTER to exit...\n");
     getchar();
