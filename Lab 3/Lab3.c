@@ -51,8 +51,8 @@ void MonteCarlo(int size)
         {
             // Right edge for B
             energy += -J*A[i]*B[i];
-            energy += -J*A[i-size+1];
-            energy += -J*A[i-2*size+1];
+            energy += -J*A[i-size+1]*B[i];
+            energy += -J*A[i-2*size+1]*B[i];
         }
         else
         {
@@ -73,34 +73,33 @@ void MonteCarlo(int size)
         {
             // For B
             flag = 1;
-            sign = -B[index];
             Ediff = 0.;
             if(index == size)
             {
                 // Lower right corner for B
-                Ediff += 2*J*A[index]*sign;
-                Ediff += 2*J*A[1]*sign;
-                Ediff += 2*J*A[size*size - size + 1]*sign;
+                Ediff += 2*J*A[index]*B[index];
+                Ediff += 2*J*A[1]*B[index];
+                Ediff += 2*J*A[size*size - size + 1]*B[index];
             }
             else if(index < size)
             {
                 // Lower edge for B
-                Ediff += 2*J*A[index]*sign;
-                Ediff += 2*J*A[index+1]*sign;
-                Ediff += 2*J*A[size*size-size+1+index]*sign;
+                Ediff += 2*J*A[index]*B[index];
+                Ediff += 2*J*A[index+1]*B[index];
+                Ediff += 2*J*A[size*size-size+1+index]*B[index];
             }
             else if (index%size == 0)
             {
                 // Right edge for B
-                Ediff += 2*J*A[index]*sign;
-                Ediff += 2*J*A[index-size+1];
-                Ediff += 2*J*A[index-2*size+1];
+                Ediff += 2*J*A[index]*B[index];
+                Ediff += 2*J*A[index-size+1]*B[index];
+                Ediff += 2*J*A[index-2*size+1]*B[index];
             }
             else
             {
-                Ediff += 2*J*A[index]*sign;
-                Ediff += 2*J*A[index+1]*sign;
-                Ediff += 2*J*A[index-size+1]*sign;
+                Ediff += 2*J*A[index]*B[index];
+                Ediff += 2*J*A[index+1]*B[index];
+                Ediff += 2*J*A[index-size+1]*B[index];
             }
             // printf("B: %f\t%d\n",Ediff, index);
         }
@@ -108,34 +107,33 @@ void MonteCarlo(int size)
         {
             // For A
             flag = 0;
-            sign = -A[index];
             Ediff = 0.;
             if(index == size*size - size + 1)
             {
                 // Upper left corner for A
-                Ediff += 2*J*sign*B[index];
-                Ediff += 2*J*sign*B[size*size];
-                Ediff += 2*J*sign*B[size];
+                Ediff += 2*J*A[index]*B[index];
+                Ediff += 2*J*A[index]*B[size*size];
+                Ediff += 2*J*A[index]*B[size];
             }
             else if(index%size == 1)
             {
                 // Right edge for A
-                Ediff += 2*J*sign*B[index];
-                Ediff += 2*J*sign*B[index + size - 1];
-                Ediff += 2*J*sign*B[index + 2*size - 1];
+                Ediff += 2*J*A[index]*B[index];
+                Ediff += 2*J*A[index]*B[index + size - 1];
+                Ediff += 2*J*A[index]*B[index + 2*size - 1];
             }
             else if(index > size*size-size+1)
             {
                 // Upper edge for A
-                Ediff += 2*J*sign*B[index];
-                Ediff += 2*J*sign*B[index-1];
-                Ediff += 2*J*sign*B[index%size - 1];
+                Ediff += 2*J*A[index]*B[index];
+                Ediff += 2*J*A[index]*B[index-1];
+                Ediff += 2*J*A[index]*B[index%size - 1];
             }
             else
             {
-                Ediff += 2*J*sign*B[index];
-                Ediff += 2*J*sign*B[index-1];
-                Ediff += 2*J*sign*B[index-1+size];
+                Ediff += 2*J*A[index]*B[index];
+                Ediff += 2*J*A[index]*B[index-1];
+                Ediff += 2*J*A[index]*B[index-1+size];
             }
             // printf("A: %f\n",Ediff);
         }
@@ -147,24 +145,21 @@ void MonteCarlo(int size)
             
             if(flag == 0)
             {
-                printf("%d\t%f\t%f\n",index, A[index], sign);
-                A[index] = sign;
+                A[index] *= -1;
             }
             else
             {
-                printf("%d\t%f\t%f\n",index, B[index], sign);
-                B[index] = sign;
+                B[index] *= -1;
             }
             energy += Ediff;
         }
         printf("Energy: %f\t Ediff: %f\n",energy, Ediff);
-    }
-
+        printf("Energy is: %f\n", energy);
+        }
     for(int i = 1; i <= size*size; i++)
     {
-        printf("%f\t%f\n", A[i], B[i]);
+        printf("%f\t%f\n",A[i], B[i]);
     }
-    printf("Energy is: %f\n", energy);
 }
 
 int main()
