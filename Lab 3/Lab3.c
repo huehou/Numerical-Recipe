@@ -178,23 +178,26 @@ void MonteCarlo(int size, int steps, double T, double* mean, double* var, int wa
 int main()
 {
     double mean, var;
-    int size = 10;
+    int size = 20;
     int N = 2*size*size; //number of particles
     double T = 1.; //temperature
     double C;
+
+    // Save data to file
+    FILE *ofp;
+    ofp = fopen("Lab3size20.dat", "w");
 
     for(double i = 1.; i <= 2.; i = i+0.01)
     {
         mean = 0.; var = 0.;
         MonteCarlo(size, 10000000, i, &mean, &var, size*size);
-        // printf("%f\t%f\n", mean, var);
+        printf("%f\t%f\n", mean, var);
         C = 1/(T*T*(double) N)*(var-mean*mean);
-        // printf("Heat capacity is: %f\n", C);
-        // Save data to file
-        FILE *ofp;
-        ofp = fopen("Lab2Q3.dat", "w");
+        printf("Heat capacity is: %f\n", C);
+        fprintf(ofp, "%f\t%f\n", i, C);
     }
     
+    fclose(ofp);
 
     printf("\nPress ENTER to exit...\n");
     getchar();
