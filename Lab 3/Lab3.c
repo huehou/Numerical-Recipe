@@ -13,6 +13,12 @@ double drand64(void)
 /* 
 Monte Carlo Procedure for Honeycomb lattice
 input: - size: the number of rows and columns of A and B parallelogram, which we assume to be size*size
+       - steps: Number of steps in Monte Carlo
+       - T: Temperature of the system
+       - mean: storage for <E>
+       - var: storage for <E^2>
+       - wait: Number of flips before including the energy for mean and var
+output: Nothing. Results are recorded in mean and var
 */
 void MonteCarlo(int size, int steps, double T, double* mean, double* var, int wait)
 {
@@ -164,8 +170,10 @@ void MonteCarlo(int size, int steps, double T, double* mean, double* var, int wa
             energy += Ediff;
         }
         // Calculate mean and variance
+        // Only consider the energy after sufficient amount of flips
         if(i % wait == 0)
         {
+            // Discard the first 500 points because the system is not yet in equilibrium
             if(count > 500)
             {
                 *mean += energy;
@@ -191,15 +199,17 @@ int main()
     FILE *ofp;
     ofp = fopen("Lab3size16.dat", "w");
 
+    // For various temperature
     for(double i = 1.; i <= 2.; i = i+0.025)
     {
         mean = 0.; var = 0.;
         C = 0.;
         Cvar = 0.;
         Cmean = 0.;
+        // Run Monte Carlo 5 times for error bars
         for(int j = 0; j < 5; j++)
         {
-            MonteCarlo(size, 20500*1000, i, &mean, &var, N);
+            MonteCarlo(size, 20500*2000, i, &mean, &var, N);
             printf("Running T = %f, run = %d\n", i, j);
             C = 1/(i*i*N)*(var-mean*mean);
             Cmean += C;
