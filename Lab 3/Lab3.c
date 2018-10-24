@@ -14,13 +14,12 @@ double drand64(void)
 Monte Carlo Procedure for Honeycomb lattice
 input: - size: the number of rows and columns of A and B parallelogram, which we assume to be size*size
 */
-void MonteCarlo(int size)
+void MonteCarlo(int size, int steps, double T, double* mean, double* var)
 {
     double A[size*size + 1], B[size*size + 1];
     double J = 1., sign;
     double energy = 0., Ediff;
     int index, flag;
-    double T = 1;
     double rate;
 
     // Setup the initial grid
@@ -63,7 +62,7 @@ void MonteCarlo(int size)
     }
     printf("Energy: %f\n",energy);
 
-    for(int i = 0; i < 1000; i++)
+    for(int i = 0; i < steps; i++)
     {
         // Pick a random site to flip
         index = (int) (drand64()*size*size + 1);
@@ -153,19 +152,27 @@ void MonteCarlo(int size)
             }
             energy += Ediff;
         }
-        printf("Energy: %f\t Ediff: %f\n",energy, Ediff);
-        printf("Energy is: %f\n", energy);
-        }
-    for(int i = 1; i <= size*size; i++)
-    {
-        printf("%f\t%f\n",A[i], B[i]);
+        
+        // Calculate mean and variance
+        *mean += energy;
+        *var += energy*energy;
     }
+    *mean = *mean/steps;
+    *var = *var/steps;
 }
 
 int main()
 {
-    MonteCarlo(3);
-    printf("Hello World!\n");
+    double mean, var;
+    int size = 3;
+    int N = 2*size*size; //number of particles
+    double T = 1.; //temperature
+    double C;
+
+    MonteCarlo(size, 1000, T, &mean, &var);
+    printf("%f\t%f\n", mean, var);
+    C = 1/(T*T*(double) N)*(var-mean*mean);
+    printf("Heat capacity is: %f\n", C);
 
     printf("\nPress ENTER to exit...\n");
     getchar();
