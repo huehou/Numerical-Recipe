@@ -166,35 +166,51 @@ void MonteCarlo(int size, int steps, double T, double* mean, double* var, int wa
         // Calculate mean and variance
         if(i % wait == 0)
         {
-            *mean += energy;
-            *var += energy*energy;
+            if(count > 500)
+            {
+                *mean += energy;
+                *var += energy*energy;
+            }
             count += 1;
         }
     }
-    *mean = *mean/count;
-    *var = *var/count;
+    *mean = *mean/(count-500);
+    *var = *var/(count-500);
+    printf("count = %f\t energy = %f\n", count, energy);
 }
 
 int main()
 {
     double mean, var;
-    int size = 20;
+    int size = 16;
     int N = 2*size*size; //number of particles
     double T = 1.; //temperature
-    double C;
+    double C, Cmean, Cvar;
 
     // Save data to file
     FILE *ofp;
-    ofp = fopen("Lab3size20.dat", "w");
+    ofp = fopen("Lab3size16.dat", "w");
 
-    for(double i = 1.; i <= 2.; i = i+0.01)
+    for(double i = 1.; i <= 2.; i = i+0.025)
     {
         mean = 0.; var = 0.;
-        MonteCarlo(size, 10000000, i, &mean, &var, size*size);
-        printf("%f\t%f\n", mean, var);
-        C = 1/(T*T*(double) N)*(var-mean*mean);
-        printf("Heat capacity is: %f\n", C);
-        fprintf(ofp, "%f\t%f\n", i, C);
+        C = 0.;
+        Cvar = 0.;
+        Cmean = 0.;
+        for(int j = 0; j < 5; j++)
+        {
+            MonteCarlo(size, 20500*1000, i, &mean, &var, N);
+            printf("Running T = %f, run = %d\n", i, j);
+            C = 1/(i*i*N)*(var-mean*mean);
+            Cmean += C;
+            Cvar += C*C;
+        }
+        Cmean /= 5;
+        Cvar /= 5;
+        Cvar = Cvar - Cmean*Cmean;
+        Cvar = sqrt(Cvar);
+
+        fprintf(ofp, "%f\t%f\t%f\n", i, C, Cvar);
     }
     
     fclose(ofp);

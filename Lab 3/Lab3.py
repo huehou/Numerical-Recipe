@@ -14,13 +14,16 @@ file = np.loadtxt(filename)
 np.array(file)
 x = file[:, 0]
 y = file[:, 1]
+yerror = file[:,2]
 
 filename = "Lab3size20.dat"
 file = np.loadtxt(filename)
 np.array(file)
 x2 = file[:, 0]
 y2 = file[:, 1]
+yerror2 = file[:,2]
+
 
 plt.figure()
-plt.plot(x, y, '.')
-plt.plot(x2, y2, '.')
+plt.errorbar(x, y, yerror, capsize = 2, linewidth = 0, marker='.')
+plt.errorbar(x2, y2, yerror2, capsize = 2, linewidth = 0, marker='.')
