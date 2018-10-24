@@ -14,12 +14,13 @@ double drand64(void)
 Monte Carlo Procedure for Honeycomb lattice
 input: - size: the number of rows and columns of A and B parallelogram, which we assume to be size*size
 */
-void MonteCarlo(int size, int steps, double T, double* mean, double* var)
+void MonteCarlo(int size, int steps, double T, double* mean, double* var, int wait)
 {
     double A[size*size + 1], B[size*size + 1];
     double J = 1.;
     double energy = 0., Ediff = 0.;
     int index, flag;
+    double count = 0.;
     double rate;
 
     *mean = 0.;
@@ -163,28 +164,35 @@ void MonteCarlo(int size, int steps, double T, double* mean, double* var)
             energy += Ediff;
         }
         // Calculate mean and variance
-        *mean += energy;
-        *var += energy*energy;
+        if(i % wait == 0)
+        {
+            *mean += energy;
+            *var += energy*energy;
+            count += 1;
+        }
     }
-    *mean = *mean/steps;
-    *var = *var/steps;
+    *mean = *mean/count;
+    *var = *var/count;
 }
 
 int main()
 {
     double mean, var;
-    int size = 3;
+    int size = 10;
     int N = 2*size*size; //number of particles
     double T = 1.; //temperature
     double C;
 
-    for(double i = 1.; i <= 1.1; i = i+0.1)
+    for(double i = 1.; i <= 2.; i = i+0.01)
     {
         mean = 0.; var = 0.;
-        MonteCarlo(size, 1000, i, &mean, &var);
-        printf("%f\t%f\n", mean, var);
+        MonteCarlo(size, 10000000, i, &mean, &var, size*size);
+        // printf("%f\t%f\n", mean, var);
         C = 1/(T*T*(double) N)*(var-mean*mean);
-        printf("Heat capacity is: %f\n", C);
+        // printf("Heat capacity is: %f\n", C);
+        // Save data to file
+        FILE *ofp;
+        ofp = fopen("Lab2Q3.dat", "w");
     }
     
 
