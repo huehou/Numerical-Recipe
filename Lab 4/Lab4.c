@@ -5,7 +5,7 @@
 #define PI 3.1415926535897932385
 
 /* 
-Perform FFT on wave function
+Perform FFT on wave function in position space
 input: - N: length of the position space
        - x: array of the position space
        - psi: The position wave function
@@ -49,6 +49,15 @@ void fft(int N, double* x, double complex* psi, double* k, double complex* psik)
     fftw_free(in); fftw_free(out);
 }
 
+/* 
+Perform IFFT on wave function in momentum space
+input: - N: length of the position space
+       - x: array of the position space
+       - psi: The position wave function
+       - k: the array of the momentum space
+       - psik: the momentum wave function
+output: None. The position space and wave function is recorded in x and psi respectively
+*/
 void ifft(int N, double* x, double complex* psi, double* k, double complex* psik)
 {
     fftw_complex *in, *out;
