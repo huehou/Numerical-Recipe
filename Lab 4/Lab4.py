@@ -6,23 +6,23 @@ import matplotlib.pyplot as plt
 # Problem 1(a) - Exact Solution
 # =============================================================================
 
-V0 = 1
-
-e = np.linspace(0, 2, 1000)
-
-T = np.zeros(1000)
-
-for i in range(e.size):
-    if (e[i] > V0):
-        T[i] = (1 + V0**2/(4*e[i]*(e[i]-V0))*(np.sin(10*np.sqrt(e[i]-V0)))**2)**(-1)
-    else:
-        T[i] = (1 + V0**2/(4*e[i]*(V0-e[i]))*(np.sinh(10*np.sqrt(V0-e[i])))**2)**(-1)
-
-plt.plot(e,T)
-plt.tick_params(direction = 'in', right = True, top = True)
-plt.xlabel('$E$ (eV)')
-plt.ylabel('$T$')
-plt.title('Problem 1(a) - Exact transmission probability T against E (eV)')
+#V0 = 1
+#
+#e = np.linspace(0, 2, 1000)
+#
+#T = np.zeros(1000)
+#
+#for i in range(e.size):
+#    if (e[i] > V0):
+#        T[i] = (1 + V0**2/(4*e[i]*(e[i]-V0))*(np.sin(10*np.sqrt(e[i]-V0)))**2)**(-1)
+#    else:
+#        T[i] = (1 + V0**2/(4*e[i]*(V0-e[i]))*(np.sinh(10*np.sqrt(V0-e[i])))**2)**(-1)
+#
+#plt.plot(e,T)
+#plt.tick_params(direction = 'in', right = True, top = True)
+#plt.xlabel('$E$ (eV)')
+#plt.ylabel('$T$')
+#plt.title('Problem 1(a) - Exact transmission probability T against E (eV)')
 
 #Test 2
 
@@ -41,57 +41,95 @@ plt.title('Problem 1(a) - Exact transmission probability T against E (eV)')
 # Problem 1(b) - Prototype
 # =============================================================================
 
-#def fft(x, fun):
-#    '''
-#    Performs discrete Fourier transforms with factors corrected to approximate 
-#    continuous Fourier transform.
-#    @param: x  : list of x coordinates
-#            fun: list of function values
-#    @return: k  : list of wave number coordinates
-#             fun: list of fourier transformed values
-#    '''
-#    # Shift the negative frequency to the back
-#    fun = np.fft.ifftshift(fun)
-#    # Do Fourier transform
-#    fun = np.fft.fft(fun)
-#    # Shift the frequency back to the normal order
-#    fun = np.fft.fftshift(fun)
-#    # Multiply by the prefactors
-#    fun = fun * (x[1]-x[0]) / np.sqrt(2*np.pi)
-#    # Get frequency space
-#    k = np.fft.fftfreq(len(x),x[1]-x[0])
-#    # Shift the negative frequency back to the front
-#    k = np.fft.fftshift(k)
-#    # Correcting the frequency space by a factor of 2 pi
-#    k = k * 2 * np.pi
-#    
-#    return k, fun
-#
-#def ifft(x,fun):
-#    # Shift the negative frequency to the back
-#    fun = np.fft.ifftshift(fun)
-#    # Do Fourier transform
-#    fun = np.fft.ifft(fun)
-#    # Shift the frequency back to the normal order
-#    fun = np.fft.fftshift(fun)
-#    # Multiply by the prefactors
-#    fun = fun * (x[1]-x[0]) / np.sqrt(2*np.pi) * len(x)
-#    # Get frequency space
-#    k = np.fft.fftfreq(len(x),x[1]-x[0])
-#    # Shift the negative frequency back to the front
-#    k = np.fft.fftshift(k)
-#    # Correcting the frequency space by a factor of 2 pi
-#    k = k * 2 * np.pi
-#    
-#    return k, fun
-#
-#
-#sigma = 1
-#x0 = 0 
-#hbar = 1
-#p0 = 1
-#x = np.linspace(-2,2,100)
-#psi0 = np.exp(-1/(2*sigma**2)*(x-x0)**2 + 1j/hbar*p0*(x-x0))
-#
-#plt.plot(x, psi0.real, x, psi0.imag)
+def fft(x, fun):
+    '''
+    Performs discrete Fourier transforms with factors corrected to approximate 
+    continuous Fourier transform.
+    @param: x  : list of x coordinates
+            fun: list of function values
+    @return: k  : list of wave number coordinates
+             fun: list of fourier transformed values
+    '''
+    # Shift the negative frequency to the back
+    fun = np.fft.ifftshift(fun)
+    # Do Fourier transform
+    fun = np.fft.fft(fun)
+    # Shift the frequency back to the normal order
+    fun = np.fft.fftshift(fun)
+    # Multiply by the prefactors
+    fun = fun * (x[1]-x[0]) / np.sqrt(2*np.pi)
+    # Get frequency space
+    k = np.fft.fftfreq(len(x),x[1]-x[0])
+    # Shift the negative frequency back to the front
+    k = np.fft.fftshift(k)
+    # Correcting the frequency space by a factor of 2 pi
+    k = k * 2 * np.pi
+    
+    return k, fun
 
+def ifft(x,fun):
+    # Shift the negative frequency to the back
+    fun = np.fft.ifftshift(fun)
+    # Do Fourier transform
+    fun = np.fft.ifft(fun)
+    # Shift the frequency back to the normal order
+    fun = np.fft.fftshift(fun)
+    # Multiply by the prefactors
+    fun = fun * (x[1]-x[0]) / np.sqrt(2*np.pi) * len(x)
+    # Get frequency space
+    k = np.fft.fftfreq(len(x),x[1]-x[0])
+    # Shift the negative frequency back to the front
+    k = np.fft.fftshift(k)
+    # Correcting the frequency space by a factor of 2 pi
+    k = k * 2 * np.pi
+    
+    return k, fun
+
+
+E = 2
+hbar = 1
+m = 1
+sigma = 10
+x0 = -10 
+p0 = np.sqrt(2*m*E)
+a = np.sqrt(100*hbar**2/2/m)
+x = np.linspace(-100,100,10000)
+psi0 = np.exp(-1/(2*sigma**2)*(x-x0)**2 + 1j/hbar*p0*(x-x0))
+norm = np.trapz(np.abs(psi0),x)
+
+# The wall
+V = []
+for i in range(x.size):
+    if 0 <= x[i] <= a:
+        V += [1]
+    else:
+        V += [0]
+V = np.array(V, dtype = "complex")
+
+plt.plot(x, V)
+
+
+# Wave function
+plt.plot(x, np.abs(psi0))
+
+# ST procedure
+dt = 0.1
+steps = 100
+for i in range(steps):
+    psi0 = np.exp(-1j/hbar*dt*V)*psi0
+    k, psik = fft(x, psi0)
+    psik = np.exp(-1j/hbar*k**2/2/m*dt)*psik
+    x, psi0 = ifft(k, psik)
+    plt.plot(x, V)
+    plt.plot(x, np.abs(psi0))
+    
+T = np.trapz(np.abs(psi0),x)
+print(T)
+
+## The wall
+#y = np.linspace(0,1,100)
+#wall1 = np.zeros(y.size)
+#wall2 = a*np.ones(y.size)
+#walltopx = np.linspace(0,a,100)
+#walltopy = np.ones(walltopx.size)
+#plt.plot(wall1, y, 'k', wall2, y, 'k', walltopx, walltopy, 'k')
