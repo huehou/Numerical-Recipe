@@ -171,3 +171,11 @@ np.array(file)
 #
 #plt.plot(x, y)
 plt.plot(file)
+
+filename = "trial.dat"
+file = np.loadtxt(filename)
+np.array(file)
+x = file[:, 0]
+y = file[:, 1]
+
+plt.plot(x, y)

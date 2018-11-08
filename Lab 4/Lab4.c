@@ -15,25 +15,31 @@ void fft(int N, double* x, double complex* psi, double* k, double complex* psik)
     {
         in[i] = psi[(i+N/2)%N];
     }
+
+    out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*N);
+    p = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+
+    fftw_execute(p);
+    
     for(int i = 0; i < N; i++)
     {
-        printf("%f\t",cabs(in[i]));
+        psik[i] = out[(i+N/2)%N];
     }
-    printf("\n");
-    for(int i = 0; i < N; i++)
-    {
-        printf("%f\t",cabs(psi[i]));
-    }
+
+    fftw_destroy_plan(p);
+    fftw_free(in); fftw_free(out);
 }
 
 void test_fft()
 {
-    double x[10000];
-    double complex psi[10000];
-    double x0 = -100., dx = 200./10000.;
+    int N = 10000;
+    double x[N];
+    double complex psi[N];
+    double complex psik[N];
+    double x0 = -100., dx = 200./N;
     FILE *ofp;
     ofp = fopen("trial.dat", "w");
-    for(int i = 0; i < 10000; i++)
+    for(int i = 0; i < N; i++)
     {
         x[i] = x0 + dx*i;
         psi[i] = exp(-x[i]*x[i]);
@@ -43,29 +49,18 @@ void test_fft()
 
     fclose(ofp);
 
-    fftw_complex *in, *out;
-    fftw_plan p;
-    int N = 10000;
-
-    out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*N);
-    p = fftw_plan_dft_1d(N, psi, out, FFTW_FORWARD, FFTW_ESTIMATE);
-    
-    fftw_execute(p);
-    
+    fft(N, x, psi, x, psik);
     
 
     // FILE *ofp;
     ofp = fopen("fft.dat", "w");
-    for(int i = 0; i < 10000; i++)
+    for(int i = 0; i < N; i++)
     {
-        printf("%f\n", cabs(out[i]));
-        fprintf(ofp, "%f\n", cabs(out[i]));
+        printf("%f\n", cabs(psik[i]));
+        fprintf(ofp, "%f\n", cabs(psik[i]));
     }
 
     fclose(ofp);
-
-    fftw_destroy_plan;
-    fftw_free(in); fftw_free(out);
 
 }
 
@@ -86,7 +81,7 @@ void test2()
 
 int main()
 {
-    test2();
+    test_fft();
     
     return 0;
 }
