@@ -176,8 +176,11 @@ file = np.loadtxt(filename)
 np.array(file)
 x = file[:, 0]
 y = file[:, 1]
+z = file[:, 2]
 
-plt.plot(x, y)
+plt.plot(x, y, x, z)
 
-exact = np.exp(-x**2/4)/np.sqrt(2)
-plt.plot(x,exact)
+exact = np.exp(-1/4*x*(20*1j+x))/np.sqrt(2)
+np.exp(-x**2/4)/np.sqrt(2)
+plt.plot(x,np.real(exact), x, np.imag(exact))
+plt.xlim([-10,10])
