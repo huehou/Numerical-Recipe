@@ -163,15 +163,6 @@ import matplotlib.animation as an
 # Problem 1(b) - Plot
 # =============================================================================
 
-filename = "fft.dat"
-file = np.loadtxt(filename)
-np.array(file)
-#x = file[:, 0]
-#y = file[:, 1]
-#
-#plt.plot(x, y)
-plt.plot(file)
-
 filename = "trial.dat"
 file = np.loadtxt(filename)
 np.array(file)
@@ -179,3 +170,14 @@ x = file[:, 0]
 y = file[:, 1]
 
 plt.plot(x, y)
+
+filename = "fft.dat"
+file = np.loadtxt(filename)
+np.array(file)
+x = file[:, 0]
+y = file[:, 1]
+
+plt.plot(x, y)
+
+exact = np.exp(-x**2/4)/np.sqrt(2)
+plt.plot(x,exact)

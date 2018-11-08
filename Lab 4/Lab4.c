@@ -2,6 +2,7 @@
 #include <complex.h>
 #include <fftw3.h>
 #include <math.h>
+#define PI 3.1415926535897932385
 
 void fft(int N, double* x, double complex* psi, double* k, double complex* psik)
 {
@@ -11,19 +12,28 @@ void fft(int N, double* x, double complex* psi, double* k, double complex* psik)
     in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*N);
     out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*N);
 
+    // FFTSHIFT: Shift the domain for FFT
     for(int i = 0; i < N; i++)
     {
         in[i] = psi[(i+N/2)%N];
     }
 
+    // Perform FFT
     out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*N);
     p = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
-
     fftw_execute(p);
     
+    // IFFTSHIFT: Shift the domain back to normal
+    double dx = x[1]-x[0];
     for(int i = 0; i < N; i++)
     {
-        psik[i] = out[(i+N/2)%N];
+        psik[i] = out[(i+N/2)%N]*dx/sqrt(2*PI);
+    }
+
+    // Momentum domain
+    for(int i = 0; i < N; i++)
+    {
+        k[i] = 2 * PI * (i-N/2) / (N*dx);
     }
 
     fftw_destroy_plan(p);
@@ -34,6 +44,7 @@ void test_fft()
 {
     int N = 10000;
     double x[N];
+    double k[N];
     double complex psi[N];
     double complex psik[N];
     double x0 = -100., dx = 200./N;
@@ -49,15 +60,15 @@ void test_fft()
 
     fclose(ofp);
 
-    fft(N, x, psi, x, psik);
+    fft(N, x, psi, k, psik);
     
 
     // FILE *ofp;
     ofp = fopen("fft.dat", "w");
     for(int i = 0; i < N; i++)
     {
-        printf("%f\n", cabs(psik[i]));
-        fprintf(ofp, "%f\n", cabs(psik[i]));
+        printf("%f\t%f\n", k[i], cabs(psik[i]));
+        fprintf(ofp, "%f\t%f\n", k[i], cabs(psik[i]));
     }
 
     fclose(ofp);
