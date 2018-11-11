@@ -144,9 +144,40 @@ void test2()
     fft(10, x, psi, x, psi);
 }
 
+void Problem1b()
+{
+    int N = 10000;
+    double x[N]; // position
+    double k[N]; // momentum
+    double complex psi[N]; // position wave function
+    double complex psik[N]; // momentum wave function
+    double x0 = -500., dx = 1600./N;
+
+    FILE *ofp;
+    ofp = fopen("trial.dat","w");
+
+    // Initial position space
+    for(int i = 0; i < N; i ++)
+    {
+        x[i] = -800. + dx*i;
+    }
+
+    // Initial wave function
+    double complex m = 1., hbar = 1;
+    double complex sigma = 90;
+    double complex E = 2;
+    double complex p0 = sqrt(2*m*E);
+    for(int i = 0; i < N; i++)
+    {
+        psi[i] = exp(-1./(2.*sigma*sigma)*(x[i]-x0)*(x[i]-x0) + I/hbar*p0*(x[i]-x0));
+        fprintf(ofp, "%f\t%f\n", x[i], cabs(psi[i])*cabs(psi[i]));
+    }
+    fclose(ofp);
+}
+
 int main()
 {
-    test_fft();
+    Problem1b();
     
     return 0;
 }
