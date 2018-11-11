@@ -293,7 +293,7 @@ void Problem1c()
 
 int main()
 {
-    Problem1b();
+    Problem1c();
     
     return 0;
 }

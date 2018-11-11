@@ -185,6 +185,15 @@ x = file[:, 0]
 y = file[:, 1]
 
 plt.plot(x, y)
+
+filename = "Problem1c.dat"
+file = np.loadtxt(filename)
+np.array(file)
+x = file[:, 0]
+y = file[:, 1]
+
+plt.figure()
+plt.plot(x, y)
 #
 #filename = "fft.dat"
 #file = np.loadtxt(filename)
