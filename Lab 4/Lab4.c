@@ -154,7 +154,97 @@ void Problem1b()
     ofp = fopen("Problem1b.dat","w");
 
 
-    for(double E = 2.; E > 1.93; E -= dE)
+    for(double E = 2.; E > 0.6; E -= dE)
+    {
+        printf("Doing E = %f \n", E);
+        p0 = sqrt(2*m*E);
+        for(int i = 0; i < N; i++)
+        {
+            psi[i] = cexp(-1./(2.*sigma*sigma)*(x[i]-x0)*(x[i]-x0) + I/hbar*p0*(x[i]-x0));
+            prob0[i] = cabs(psi[i])*cabs(psi[i]);
+        }
+
+        double norm = integrate(prob0, 0, N, dx);
+
+        // Suzuki-Trotter procedure
+        double T = 800./p0;
+        double dt = dx/p0;
+        for(double t = 0; t <= T; t += dt)
+        {
+            for(int i = 0; i < N; i++)
+            {
+                psi[i] = cexp(-I/hbar*dt*V[i])*psi[i];
+            }
+
+            fft(N, x, psi, k, psik);
+
+            for(int i = 0; i < N; i++)
+            {
+                psik[i] = cexp(-I/hbar*dt*k[i]*k[i]/2/m)*psik[i];
+            }
+
+            ifft(N, x, psi, k, psik);
+        }
+        
+        double prob[N];
+        for(int i = 0; i < N; i++)
+        {
+            prob[i] = cabs(psi[i])*cabs(psi[i]);
+        }
+        double trans = integrate(prob, index, N, dx);
+        trans = trans/norm;
+        printf("Transmission probability for E = %f is %f.\n", E, trans);
+        fprintf(ofp, "%f\t%f\n", E, trans);
+    }
+    
+
+    fclose(ofp);
+}
+
+void Problem1c()
+{
+    int N = 10000;
+    double x[N]; // position
+    double k[N]; // momentum
+    double complex psi[N]; // position wave function
+    double complex psik[N]; // momentum wave function
+    double V[N]; // potential energy
+    double x0 = -500., dx = 1600./N;
+    double a = sqrt(50.);
+
+    // Initial position space
+    for(int i = 0; i < N; i ++)
+    {
+        x[i] = -800. + dx*i;
+    }
+
+    // Potential energy
+    int index;
+    for(int i = 0; i < N; i ++)
+    {
+        if (0 <= x[i] && x[i] < a)
+        {
+            V[i] = 4/(a*a)*(a-x[i])*x[i];
+            index = i;
+        }
+        else
+        {
+            V[i] = 0;
+        }
+    }
+
+    // Initial wave function
+    double complex m = 1., hbar = 1.;
+    double sigma = 90.;
+    double dE = 0.01;
+    double complex p0;
+    double prob0[N];
+
+    FILE *ofp;
+    ofp = fopen("Problem1c.dat","w");
+
+
+    for(double E = 2.; E > 0.6; E -= dE)
     {
         printf("Doing E = %f \n", E);
         p0 = sqrt(2*m*E);
