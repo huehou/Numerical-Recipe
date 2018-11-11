@@ -94,57 +94,6 @@ void ifft(int N, double* x, double complex* psi, double* k, double complex* psik
     fftw_free(in); fftw_free(out);
 }
 
-void test_fft()
-{
-    int N = 10000;
-    double x[N];
-    double k[N];
-    double complex psi[N];
-    double complex psik[N];
-    double x0 = -100., dx = 200./N;
-    FILE *ofp;
-    ofp = fopen("trial.dat", "w");
-    for(int i = 0; i < N; i++)
-    {
-        x[i] = x0 + dx*i;
-        psi[i] = exp(-(x[i]-5)*(x[i]-5));
-        // printf("%f\t%f\n", x[i], cabs(psi[i]));
-        fprintf(ofp, "%f\t%f\n", x[i], cabs(psi[i]));
-    }
-
-    fclose(ofp);
-
-    fft(N, x, psi, k, psik);
-    double complex psi0[N];
-    ifft(N, x, psi0, k, psik);
-
-    // FILE *ofp;
-    ofp = fopen("fft.dat", "w");
-    for(int i = 0; i < N; i++)
-    {
-        printf("%f\t%f\n", k[i], cabs(psi[i]));
-        fprintf(ofp, "%f\t%f\t%f\n", x[i], creal(psi0[i]),cimag(psi0[i]));
-    }
-
-    fclose(ofp);
-
-}
-
-void test2()
-{
-    double x[10];
-    double complex psi[10];
-
-    for(int i = -5 ; i < 5; i ++)
-    {
-        x[i+5] = i;
-        psi[i+5] = i;
-    }
-    
-    fft(10, x, psi, x, psi);
-    fft(10, x, psi, x, psi);
-}
-
 double integrate(double *psi, int start, int N, double dx)
 {
     double sum = 0.;
@@ -202,12 +151,11 @@ void Problem1b()
     }
 
     double norm = integrate(prob0, 0, N, dx);
-    printf("Norm is %f\n", norm);
 
     // Suzuki-Trotter procedure
     double T = 800./p0;
     double dt = dx/p0;
-    for(double t = 0; t <= dt; t += dt)
+    for(double t = 0; t <= T; t += dt)
     {
         for(int i = 0; i < N; i++)
         {
