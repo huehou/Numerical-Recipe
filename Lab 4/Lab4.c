@@ -145,6 +145,17 @@ void test2()
     fft(10, x, psi, x, psi);
 }
 
+double integrate(double *psi, int start, int N, double dx)
+{
+    double sum = 0.;
+    for(int i = 1; i < N-1; i++)
+    {
+        sum += psi[i]*dx;
+    }
+    sum += (psi[0] + psi[N-1])*dx/2.;
+    return sum;
+}
+
 void Problem1b()
 {
     int N = 10000;
@@ -163,11 +174,13 @@ void Problem1b()
     }
 
     // Potential energy
+    int index;
     for(int i = 0; i < N; i ++)
     {
         if (0 <= x[i] && x[i] < a)
         {
             V[i] = 1;
+            index = i;
         }
         else
         {
@@ -180,16 +193,21 @@ void Problem1b()
     double sigma = 90.;
     double E = 2.;
     double complex p0 = sqrt(2*m*E);
+    double prob0[N];
 
     for(int i = 0; i < N; i++)
     {
         psi[i] = cexp(-1./(2.*sigma*sigma)*(x[i]-x0)*(x[i]-x0) + I/hbar*p0*(x[i]-x0));
+        prob0[i] = cabs(psi[i])*cabs(psi[i]);
     }
+
+    double norm = integrate(prob0, 0, N, dx);
+    printf("Norm is %f\n", norm);
 
     // Suzuki-Trotter procedure
     double T = 800./p0;
     double dt = dx/p0;
-    for(double t = 0; t <= T; t += dt)
+    for(double t = 0; t <= dt; t += dt)
     {
         for(int i = 0; i < N; i++)
         {
