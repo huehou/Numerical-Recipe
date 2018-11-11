@@ -148,11 +148,11 @@ void test2()
 double integrate(double *psi, int start, int N, double dx)
 {
     double sum = 0.;
-    for(int i = 1; i < N-1; i++)
+    for(int i = start+1; i < N-1; i++)
     {
         sum += psi[i]*dx;
     }
-    sum += (psi[0] + psi[N-1])*dx/2.;
+    sum += (psi[start] + psi[N-1])*dx/2.;
     return sum;
 }
 
@@ -223,14 +223,15 @@ void Problem1b()
 
         ifft(N, x, psi, k, psik);
     }
-    printf("%f\t%f\t%f\n", creal(cexp(I)), cimag(cexp(I)), cabs(cexp(I)));
     
-    FILE *ofp;
-    ofp = fopen("trial.dat", "w");
+    double prob[N];
     for(int i = 0; i < N; i++)
     {
-        fprintf(ofp, "%f\t%f\n", x[i],cabs(psi[i])*cabs(psi[i]));
+        prob[i] = cabs(psi[i])*cabs(psi[i]);
     }
+    double trans = integrate(prob, index, N, dx);
+    trans = trans/norm;
+    printf("%f\t%f\n",x[index], trans);
 }
 
 int main()
