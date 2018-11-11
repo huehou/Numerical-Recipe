@@ -151,10 +151,9 @@ void Problem1b()
     double k[N]; // momentum
     double complex psi[N]; // position wave function
     double complex psik[N]; // momentum wave function
+    double V[N]; // potential energy
     double x0 = -500., dx = 1600./N;
-
-    FILE *ofp;
-    ofp = fopen("trial.dat","w");
+    double a = sqrt(50.);
 
     // Initial position space
     for(int i = 0; i < N; i ++)
@@ -162,17 +161,32 @@ void Problem1b()
         x[i] = -800. + dx*i;
     }
 
+    FILE *ofp;
+    ofp = fopen("trial.dat", "w");
+    // Potential energy
+    for(int i = 0; i < N; i ++)
+    {
+        if (0 <= x[i] && x[i] < a)
+        {
+            V[i] = 1;
+        }
+        else
+        {
+            V[i] = 0;
+        }
+        fprintf(ofp, "%f\t%f\n", x[i], V[i]);
+    }
+    fclose(ofp);
+
     // Initial wave function
-    double complex m = 1., hbar = 1;
+    double complex m = 1., hbar = 1.;
     double complex sigma = 90;
     double complex E = 2;
     double complex p0 = sqrt(2*m*E);
     for(int i = 0; i < N; i++)
     {
         psi[i] = exp(-1./(2.*sigma*sigma)*(x[i]-x0)*(x[i]-x0) + I/hbar*p0*(x[i]-x0));
-        fprintf(ofp, "%f\t%f\n", x[i], cabs(psi[i])*cabs(psi[i]));
     }
-    fclose(ofp);
 }
 
 int main()
