@@ -94,6 +94,14 @@ void ifft(int N, double* x, double complex* psi, double* k, double complex* psik
     fftw_free(in); fftw_free(out);
 }
 
+/* 
+Integration by Trapezoidal Rule
+input: - psi: The integrand array
+       - start: The starting index
+       - N: The length of the array
+       - dx: The spacing of the position
+output: The value of the integration
+*/
 double integrate(double *psi, int start, int N, double dx)
 {
     double sum = 0.;
@@ -140,46 +148,57 @@ void Problem1b()
     // Initial wave function
     double complex m = 1., hbar = 1.;
     double sigma = 90.;
-    double E = 2.;
-    double complex p0 = sqrt(2*m*E);
+    double dE = 0.01;
+    double complex p0;
     double prob0[N];
 
-    for(int i = 0; i < N; i++)
-    {
-        psi[i] = cexp(-1./(2.*sigma*sigma)*(x[i]-x0)*(x[i]-x0) + I/hbar*p0*(x[i]-x0));
-        prob0[i] = cabs(psi[i])*cabs(psi[i]);
-    }
+    FILE *ofp;
+    ofp = fopen("Problem1b.dat","w");
 
-    double norm = integrate(prob0, 0, N, dx);
-
-    // Suzuki-Trotter procedure
-    double T = 800./p0;
-    double dt = dx/p0;
-    for(double t = 0; t <= T; t += dt)
+    for(double E = 2.; E > 0.6; E -= dE)
     {
+        printf("Doing E = %f \n", E);
+        p0 = sqrt(2*m*E);
         for(int i = 0; i < N; i++)
         {
-            psi[i] = cexp(-I/hbar*dt*V[i])*psi[i];
+            psi[i] = cexp(-1./(2.*sigma*sigma)*(x[i]-x0)*(x[i]-x0) + I/hbar*p0*(x[i]-x0));
+            prob0[i] = cabs(psi[i])*cabs(psi[i]);
         }
 
-        fft(N, x, psi, k, psik);
+        double norm = integrate(prob0, 0, N, dx);
 
+        // Suzuki-Trotter procedure
+        double T = 800./p0;
+        double dt = dx/p0;
+        for(double t = 0; t <= T; t += dt)
+        {
+            for(int i = 0; i < N; i++)
+            {
+                psi[i] = cexp(-I/hbar*dt*V[i])*psi[i];
+            }
+
+            fft(N, x, psi, k, psik);
+
+            for(int i = 0; i < N; i++)
+            {
+                psik[i] = cexp(-I/hbar*dt*k[i]*k[i]/2/m)*psik[i];
+            }
+
+            ifft(N, x, psi, k, psik);
+        }
+        
+        double prob[N];
         for(int i = 0; i < N; i++)
         {
-            psik[i] = cexp(-I/hbar*dt*k[i]*k[i]/2/m)*psik[i];
+            prob[i] = cabs(psi[i])*cabs(psi[i]);
         }
+        double trans = integrate(prob, index, N, dx);
+        trans = trans/norm;
+        printf("Transmission probability for E = %f is %f.\n", E, trans);
+        fprintf(ofp, "%f\t%f\n", E, trans);
+    }
 
-        ifft(N, x, psi, k, psik);
-    }
-    
-    double prob[N];
-    for(int i = 0; i < N; i++)
-    {
-        prob[i] = cabs(psi[i])*cabs(psi[i]);
-    }
-    double trans = integrate(prob, index, N, dx);
-    trans = trans/norm;
-    printf("%f\t%f\n",x[index], trans);
+    fclose(ofp);
 }
 
 int main()
