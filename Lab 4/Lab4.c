@@ -19,7 +19,6 @@ void fft(int N, double* x, double complex* psi, double* k, double complex* psik)
     fftw_plan p;
 
     in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*N);
-    out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*N);
 
     // FFTSHIFT: Shift the domain for FFT
     for(int i = 0; i < N; i++)
@@ -64,7 +63,6 @@ void ifft(int N, double* x, double complex* psi, double* k, double complex* psik
     fftw_plan p;
 
     in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*N);
-    out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*N);
 
     // FFTSHIFT: Shift the domain for IFFT
     for(int i = 0; i < N; i++)
@@ -155,7 +153,8 @@ void Problem1b()
     FILE *ofp;
     ofp = fopen("Problem1b.dat","w");
 
-    for(double E = 2.; E > 0.6; E -= dE)
+
+    for(double E = 2.; E > 1.93; E -= dE)
     {
         printf("Doing E = %f \n", E);
         p0 = sqrt(2*m*E);
@@ -197,6 +196,7 @@ void Problem1b()
         printf("Transmission probability for E = %f is %f.\n", E, trans);
         fprintf(ofp, "%f\t%f\n", E, trans);
     }
+    
 
     fclose(ofp);
 }
