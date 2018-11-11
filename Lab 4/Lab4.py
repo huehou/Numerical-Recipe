@@ -177,7 +177,7 @@ plt.plot(x, y)
 #x = file[:, 0]
 #y = file[:, 1]
 #z = file[:, 2]
-#
+##
 #plt.plot(x, y, x, z)
 #
 #exact = np.exp(-1/4*x*(20*1j+x))/np.sqrt(2)

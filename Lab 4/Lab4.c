@@ -115,14 +115,15 @@ void test_fft()
     fclose(ofp);
 
     fft(N, x, psi, k, psik);
-    ifft(N, x, psi, k, psik);
+    double complex psi0[N];
+    ifft(N, x, psi0, k, psik);
 
     // FILE *ofp;
     ofp = fopen("fft.dat", "w");
     for(int i = 0; i < N; i++)
     {
         printf("%f\t%f\n", k[i], cabs(psi[i]));
-        fprintf(ofp, "%f\t%f\t%f\n", x[i], creal(psi[i]),cimag(psi[i]));
+        fprintf(ofp, "%f\t%f\t%f\n", x[i], creal(psi0[i]),cimag(psi0[i]));
     }
 
     fclose(ofp);
@@ -161,8 +162,6 @@ void Problem1b()
         x[i] = -800. + dx*i;
     }
 
-    FILE *ofp;
-    ofp = fopen("trial.dat", "w");
     // Potential energy
     for(int i = 0; i < N; i ++)
     {
@@ -174,18 +173,45 @@ void Problem1b()
         {
             V[i] = 0;
         }
-        fprintf(ofp, "%f\t%f\n", x[i], V[i]);
     }
-    fclose(ofp);
 
     // Initial wave function
     double complex m = 1., hbar = 1.;
-    double complex sigma = 90;
-    double complex E = 2;
+    double sigma = 90.;
+    double E = 2.;
     double complex p0 = sqrt(2*m*E);
+
     for(int i = 0; i < N; i++)
     {
-        psi[i] = exp(-1./(2.*sigma*sigma)*(x[i]-x0)*(x[i]-x0) + I/hbar*p0*(x[i]-x0));
+        psi[i] = cexp(-1./(2.*sigma*sigma)*(x[i]-x0)*(x[i]-x0) + I/hbar*p0*(x[i]-x0));
+    }
+
+    // Suzuki-Trotter procedure
+    double T = 800./p0;
+    double dt = dx/p0;
+    for(double t = 0; t <= T; t += dt)
+    {
+        for(int i = 0; i < N; i++)
+        {
+            psi[i] = cexp(-I/hbar*dt*V[i])*psi[i];
+        }
+
+        fft(N, x, psi, k, psik);
+
+        for(int i = 0; i < N; i++)
+        {
+            psik[i] = cexp(-I/hbar*dt*k[i]*k[i]/2/m)*psik[i];
+        }
+
+        ifft(N, x, psi, k, psik);
+    }
+    printf("%f\t%f\t%f\n", creal(cexp(I)), cimag(cexp(I)), cabs(cexp(I)));
+    
+    FILE *ofp;
+    ofp = fopen("trial.dat", "w");
+    for(int i = 0; i < N; i++)
+    {
+        fprintf(ofp, "%f\t%f\n", x[i],cabs(psi[i])*cabs(psi[i]));
     }
 }
 
