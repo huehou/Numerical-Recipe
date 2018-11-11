@@ -154,7 +154,7 @@ void Problem1b()
     ofp = fopen("Problem1b.dat","w");
 
 
-    for(double E = 2.; E > 0.6; E -= dE)
+    for(double E = 2.; E > 0.1; E -= dE)
     {
         printf("Doing E = %f \n", E);
         p0 = sqrt(2*m*E);
@@ -244,7 +244,7 @@ void Problem1c()
     ofp = fopen("Problem1c.dat","w");
 
 
-    for(double E = 2.; E > 0.6; E -= dE)
+    for(double E = 2.; E > 0.1; E -= dE)
     {
         printf("Doing E = %f \n", E);
         p0 = sqrt(2*m*E);
@@ -293,6 +293,7 @@ void Problem1c()
 
 int main()
 {
+    Problem1b();
     Problem1c();
     
     return 0;
