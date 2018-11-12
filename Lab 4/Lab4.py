@@ -175,7 +175,7 @@ for i in range(e.size):
     else:
         T[i] = (1 + V0**2/(4*e[i]*(V0-e[i]))*(np.sinh(10*np.sqrt(V0-e[i])))**2)**(-1)
 
-plt.plot(e,T)
+plt.plot(e,T, label = "Exact")
 
 
 filename = "Problem1b.dat"
@@ -184,7 +184,15 @@ np.array(file)
 x = file[:, 0]
 y = file[:, 1]
 
-plt.plot(x, y)
+plt.plot(x, y, 'k.', markersize = 2.2, label = "ST approximation")
+plt.tick_params(direction = 'in', top = True, right = True)
+plt.xlabel('$E$ (eV)')
+plt.ylabel('$T$')
+plt.legend()
+plt.xlim([0,2])
+plt.ylim([0,1])
+plt.title("Problem 1(b) - Transmission probability $T$ against $E$ (eV)")
+
 
 filename = "Problem1c.dat"
 file = np.loadtxt(filename)
@@ -193,7 +201,15 @@ x = file[:, 0]
 y = file[:, 1]
 
 plt.figure()
-plt.plot(x, y)
+plt.plot(x, y, 'k.', markersize = 2.2)
+plt.tick_params(direction = 'in', top = True, right = True)
+plt.xlabel('$E$ (eV)')
+plt.ylabel('$T$')
+plt.legend()
+plt.xlim([0,2])
+plt.ylim([0,1])
+plt.title("Problem 1(c) - Transmission probability $T$ against $E$ (eV)")
+
 #
 #filename = "fft.dat"
 #file = np.loadtxt(filename)
