@@ -143,7 +143,7 @@ void Problem1b()
         }
     }
 
-    // Initial wave function
+    // Wave function parameters
     double complex m = 1., hbar = 1.;
     double sigma = 90.;
     double dE = 0.01;
@@ -153,17 +153,20 @@ void Problem1b()
     FILE *ofp;
     ofp = fopen("Problem1b.dat","w");
 
-
+    // Energy loop
     for(double E = 2.; E > 0.1; E -= dE)
     {
         printf("Doing E = %f \n", E);
         p0 = sqrt(2*m*E);
+
+        // Initial wave function
         for(int i = 0; i < N; i++)
         {
             psi[i] = cexp(-1./(2.*sigma*sigma)*(x[i]-x0)*(x[i]-x0) + I/hbar*p0*(x[i]-x0));
             prob0[i] = cabs(psi[i])*cabs(psi[i]);
         }
 
+        // Get initial norm
         double norm = integrate(prob0, 0, N, dx);
 
         // Suzuki-Trotter procedure
@@ -186,6 +189,7 @@ void Problem1b()
             ifft(N, x, psi, k, psik);
         }
         
+        // Get probability density
         double prob[N];
         for(int i = 0; i < N; i++)
         {
@@ -193,6 +197,7 @@ void Problem1b()
         }
         double trans = integrate(prob, index, N, dx);
         trans = trans/norm;
+        // Save to file
         printf("Transmission probability for E = %f is %f.\n", E, trans);
         fprintf(ofp, "%f\t%f\n", E, trans);
     }
@@ -233,7 +238,7 @@ void Problem1c()
         }
     }
 
-    // Initial wave function
+    // Wave function parameters
     double complex m = 1., hbar = 1.;
     double sigma = 90.;
     double dE = 0.01;
@@ -248,12 +253,15 @@ void Problem1c()
     {
         printf("Doing E = %f \n", E);
         p0 = sqrt(2*m*E);
+
+        // Initial wave function
         for(int i = 0; i < N; i++)
         {
             psi[i] = cexp(-1./(2.*sigma*sigma)*(x[i]-x0)*(x[i]-x0) + I/hbar*p0*(x[i]-x0));
             prob0[i] = cabs(psi[i])*cabs(psi[i]);
         }
 
+        // Get initial norm
         double norm = integrate(prob0, 0, N, dx);
 
         // Suzuki-Trotter procedure
@@ -276,6 +284,7 @@ void Problem1c()
             ifft(N, x, psi, k, psik);
         }
         
+        // Get probability density
         double prob[N];
         for(int i = 0; i < N; i++)
         {
@@ -283,6 +292,8 @@ void Problem1c()
         }
         double trans = integrate(prob, index, N, dx);
         trans = trans/norm;
+
+        // Save to file
         printf("Transmission probability for E = %f is %f.\n", E, trans);
         fprintf(ofp, "%f\t%f\n", E, trans);
     }
